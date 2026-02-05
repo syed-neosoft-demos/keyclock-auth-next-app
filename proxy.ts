@@ -2,7 +2,7 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
@@ -10,16 +10,16 @@ export async function middleware(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
 
-  // Allow NextAuth API routes
-  if (pathname.startsWith("/api/auth")) {
+  // Allow NextAuth API routes and the custom login page
+  if (pathname.startsWith("/api/auth") || pathname.startsWith("/auth/login")) {
     return NextResponse.next();
   }
 
-  // If not authenticated, redirect to Keycloak
+  // If not authenticated, redirect to our auto-login page which initiates signIn via POST
   if (!token) {
-    const signInUrl = new URL("/api/auth/signin/keycloak", req.url);
-    // signInUrl.searchParams.set("callbackUrl", req.url);
-    return NextResponse.redirect(signInUrl);
+    const loginUrl = new URL("/auth/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", req.url);
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();

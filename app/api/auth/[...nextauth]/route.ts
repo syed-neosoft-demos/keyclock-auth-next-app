@@ -9,6 +9,10 @@ const handler = NextAuth({
       issuer: process.env.KEYCLOAK_ISSUER!,
     }),
   ],
+  // trustHost: true,
+  pages: {
+    signIn: "/auth/login",
+  },
   session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, account }) {
