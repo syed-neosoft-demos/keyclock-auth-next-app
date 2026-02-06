@@ -7,7 +7,7 @@ export async function proxy(req: NextRequest) {
     req,
     secret: process.env.NEXTAUTH_SECRET,
   });
-
+  console.log("token :>> ", token);
   const { pathname } = req.nextUrl;
 
   // Allow NextAuth API routes and the custom login page
